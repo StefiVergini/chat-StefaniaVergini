@@ -1,19 +1,14 @@
 version: '3.8'
+
 services:
   chat-server:
     build:
       context: ./server
       dockerfile: Dockerfile
+    environment:
+      - PORT=5000
     ports:
       - "5000:5000"
-    depends_on:
-      - mysql
-      - redis
-      - rabbitmq
-    environment:
-      - DB_HOST=mysql
-      - REDIS_HOST=redis
-      - MQ_HOST=rabbitmq
 
   mysql:
     image: mysql:8
@@ -38,10 +33,22 @@ services:
 
   nginx:
     image: nginx:latest
+    depends_on:
+      - chat-server
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     ports:
       - "80:80"
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    depends_on:
+      - chat-server
+    stdin_open: true    # para poder escribir en la terminal
+    tty: true           # mantiene el terminal activo
+    # no hace falta exponer puertos, el cliente sólo se conecta saliente
 
 volumes:
   mysql_data:

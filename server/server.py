@@ -1,9 +1,11 @@
 import socket
 import threading
-
+import os
 # Configuración del servidor para conexion ip y puerto
-HOST = '127.0.0.1'
-PORT = 12345
+HOST = '0.0.0.0'
+PORT = int(os.environ.get('PORT', 5000))
+
+
 
 # diccionario para almacenar las conexiones de los clientes / usuarios 
 

@@ -12,6 +12,8 @@ COPY . .
 
 # Exponemos el puerto en el que corre el chat (configúralo según tu código, aquí usamos 5000 como ejemplo)
 EXPOSE 5000
+CMD ["python", "server.py"]
+
 
 # Comando para iniciar el servidor
 CMD ["python", "server.py"]

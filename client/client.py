@@ -2,9 +2,8 @@ import socket
 import threading
 
 # Configuración del cliente
-HOST = '127.0.0.1'
-PORT = 12345
-
+HOST = 'chat-server'
+PORT = 5000
 def receive_messages(client_socket):
     #Recibir los mensajes del servidor en un hilo separado
     while True:
