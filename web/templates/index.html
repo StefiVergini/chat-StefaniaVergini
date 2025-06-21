@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Historial de Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            padding: 8px;
+            font-size: 16px;
+            width: 250px;
+        }
+        button {
+            padding: 8px 12px;
+            font-size: 16px;
+            background-color: #2c89e8;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        button:hover {
+            background-color: #1d6ec1;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: white;
+            margin-bottom: 10px;
+            padding: 12px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .timestamp {
+            color: #888;
+            font-size: 12px;
+            display: block;
+            margin-top: 4px;
+        }
+        .volver {
+            margin-bottom: 20px;
+        }
+        .info-busqueda {
+            font-style: italic;
+            margin-bottom: 10px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>Historial de mensajes</h1>
+
+    <form method="get" action="/buscar">
+        <label>Buscar por usuario:</label>
+        <input type="text" name="usuario" value="{{ usuario or '' }}" placeholder="Nombre del usuario">
+        <button type="submit">Buscar</button>
+    </form>
+
+    {% if usuario %}
+        <div class="volver">
+            <form action="/" method="get">
+                <button type="submit">Ver todos los mensajes</button>
+            </form>
+        </div>
+        <p class="info-busqueda">Mostrando mensajes relacionados con <strong>{{ usuario }}</strong>.</p>
+    {% endif %}
+
+    <ul>
+        {% for emisor, receptor, mensaje, creado_en in mensajes %}
+            <li>
+                <strong>{{ emisor }}</strong> → <strong>{{ receptor }}</strong>: {{ mensaje }}
+                <span class="timestamp">{{ creado_en }}</span>
+            </li>
+        {% else %}
+            <li>No se encontraron mensajes.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

@@ -62,6 +62,15 @@ services:
     stdin_open: true    # para poder escribir en la terminal
     tty: true           # mantiene el terminal activo
     # no hace falta exponer puertos, el cliente sólo se conecta saliente
+  web: 
+    build:
+      context: ./web
+    ports:
+      - "5001:5000"
+    depends_on:
+      - mysql
+    networks:
+      - default 
 
 volumes:
   mysql_data:
