@@ -1,10 +1,34 @@
 import socket
 import threading
 import os
+import bcrypt
+import time
+import mysql.connector
+from mysql.connector import Error
+
+def conectar_base_datos():
+    for intento in range(10):
+        try:
+            db = mysql.connector.connect(
+                host="mysql",
+                user="root",
+                password="rootpass",
+                database="chatdb"
+            )
+            print("✅ Conexión a MySQL exitosa")
+            return db
+        except Error as e:
+            print(f"Intento {intento + 1}: Error al conectar a MySQL - {e}")
+            time.sleep(3)
+    raise Exception("❌ No se pudo conectar a MySQL después de varios intentos")
+
+
 # Configuración del servidor para conexion ip y puerto
 HOST = '0.0.0.0'
 PORT = int(os.environ.get('PORT', 5000))
 
+
+db = conectar_base_datos()
 
 
 # diccionario para almacenar las conexiones de los clientes / usuarios 
@@ -134,37 +158,47 @@ def handle_client(client_socket, address):
 
 
 def login_server(client_socket):
-    # /login
-    # funcion encargada de permitir al usuario
-    # ingresar un nombre de usuario
-    # verifica que no sea igual a otro usuario
-    # guarda el nombre elegido para que se visualice
-    # entre los otros usuarios conectados
-    # borra el nombre de usuario por default
     try:
-        # 1) Recibe el nombre de usuario
+        # 1. Pedir nombre de usuario
+        #client_socket.sendall("Ingrese su nombre de usuario:\n".encode('utf-8'))
         username = client_socket.recv(1024).decode('utf-8').strip()
 
-        # 2) Comprobar si ya existe un nombre igual -> si existe no le permite continuar
-        if username in clientes.values():
-            client_socket.sendall(
-                "Ese nombre ya está en uso. Intente otro.\n".encode('utf-8')
-            )
-            return False
+        # 2. Pedir contraseña
+        client_socket.sendall("Ingrese su contraseña:\n".encode('utf-8'))
+        password = client_socket.recv(1024).decode('utf-8').strip()
 
-        # 3) se borra el 'login por default' (IP:puerto) en usuarios{}
-        anterior = clientes[client_socket]
-        usuarios.pop(anterior, None)
+        # 3. Buscar en base de datos
+        cursor = db.cursor()
+        cursor.execute("SELECT id, password FROM usuarios WHERE nombre = %s", (username,))
+        result = cursor.fetchone()
 
-        # 4) Guardar el nuevo nombre de usuario
-        clientes[client_socket] = username
-        usuarios[username] = client_socket
-        client_socket.sendall(f"Login exitoso. Bienvenido, {username}!\n".encode('utf-8'))
-        return True
+        if result:
+            user_id, hashed_password = result
+            if bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8')):
+                # login exitoso
+                clientes[client_socket] = username
+                usuarios[username] = client_socket
+                client_socket.sendall(f"Login exitoso. Bienvenido, {username}!\n".encode('utf-8'))
+                return True
+            else:
+                client_socket.sendall("Contraseña incorrecta.\n".encode('utf-8'))
+                return False
+        else:
+            # Si no existe, registrar nuevo usuario
+            hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            cursor.execute("INSERT INTO usuarios (nombre, password) VALUES (%s, %s)", (username, hashed.decode('utf-8')))
+            db.commit()
 
-    except Exception:
-        # Si hay error retorna False
+            clientes[client_socket] = username
+            usuarios[username] = client_socket
+            client_socket.sendall(f"Usuario nuevo creado. Bienvenido, {username}!\n".encode('utf-8'))
+            return True
+
+    except Exception as e:
+        print("Error en login_server:", e)
+        client_socket.sendall("Error durante el login.\n".encode('utf-8'))
         return False
+
 
 def send_server(client_socket, conversaciones):
     #/send
