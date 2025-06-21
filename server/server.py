@@ -41,6 +41,7 @@ clientes = {}
 # se usa usuarios cuando el cliente se logueo
 usuarios = {}
 
+user_ids = {}  # clave: nombre_usuario, valor: id en la base
 #diccionario de conversaciones privadas
 conversaciones = {}
 
@@ -99,6 +100,24 @@ def handle_client(client_socket, address):
                     partner.sendall(
                         f"[Privado] {clientes.get(client_socket, 'Desconocido')}: {message}\n".encode('utf-8')
                     )
+
+                    # Guardar en la base de datos
+                    emisor = clientes.get(client_socket)
+                    receptor = clientes.get(partner)
+                    emisor_id = user_ids.get(emisor)
+                    receptor_id = user_ids.get(receptor)
+
+                    if emisor_id and receptor_id:
+                        try:
+                            cursor = db.cursor()
+                            cursor.execute(
+                                "INSERT INTO mensajes (emisor_id, receptor_id, mensaje) VALUES (%s, %s, %s)",
+                                (emisor_id, receptor_id, message)
+                            )
+                            db.commit()
+                        except Exception as e:
+                            print("Error guardando mensaje privado:", e)
+
                 # No se procesa nada mas que el chat privado hasta no salir, es decir no aparecera el menu    
                 continue 
                  
@@ -174,6 +193,7 @@ def login_server(client_socket):
 
         if result:
             user_id, hashed_password = result
+            user_ids[username] = user_id
             if bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8')):
                 # login exitoso
                 clientes[client_socket] = username
@@ -189,6 +209,9 @@ def login_server(client_socket):
             cursor.execute("INSERT INTO usuarios (nombre, password) VALUES (%s, %s)", (username, hashed.decode('utf-8')))
             db.commit()
 
+            #obtener el ultimo id insertado
+            user_id = cursor.lastrowid
+            user_ids[username] = user_id
             clientes[client_socket] = username
             usuarios[username] = client_socket
             client_socket.sendall(f"Usuario nuevo creado. Bienvenido, {username}!\n".encode('utf-8'))
@@ -281,6 +304,19 @@ def sendall_server(client_socket):
         # Construir el formato del mensaje
         mensaje_formateado = f"[Todos] {emisor}: {texto}\n"
 
+        # Guardar mensaje global en DB
+        emisor_id = user_ids.get(emisor)
+        if emisor_id:
+            try:
+                cursor = db.cursor()
+                cursor.execute(
+                    "INSERT INTO mensajes (emisor_id, receptor_id, mensaje) VALUES (%s, NULL, %s)",
+                    (emisor_id, texto)
+                )
+                db.commit()
+            except Exception as e:
+                print("Error guardando mensaje global:", e)
+        
         # Reenviar a todos excepto al emisor
         for sock in clientes:
             if sock != client_socket:
