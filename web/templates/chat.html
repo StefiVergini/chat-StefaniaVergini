@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Chat</title>
+<script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px;}
+  #chat { border: 1px solid #ccc; height: 300px; overflow-y: scroll; padding: 10px; background: #f9f9f9; }
+  #users { margin-top: 10px; }
+  .mensaje { margin-bottom: 8px; }
+  .emisor { font-weight: bold; }
+</style>
+</head>
+<body>
+<h2>Hola, {{ username }} <a href="/logout">[Salir]</a></h2>
+
+<div id="users">
+  <h3>Usuarios conectados:</h3>
+  <ul id="user-list"></ul>
+</div>
+
+<div id="chat"></div>
+
+<form id="msgForm">
+  <input type="text" id="receptor" placeholder="Usuario receptor (vacío = todos)">
+  <input type="text" id="mensaje" placeholder="Escribe tu mensaje" autocomplete="off" required>
+  <button type="submit">Enviar</button>
+</form>
+
+<script>
+  const socket = io();
+
+  const chat = document.getElementById("chat");
+  const userList = document.getElementById("user-list");
+  const msgForm = document.getElementById("msgForm");
+  const receptorInput = document.getElementById("receptor");
+  const mensajeInput = document.getElementById("mensaje");
+
+  socket.on("connect", () => {
+    console.log("Conectado al servidor");
+  });
+
+  socket.on("user_list", users => {
+    userList.innerHTML = "";
+    users.forEach(u => {
+      const li = document.createElement("li");
+      li.textContent = u;
+      userList.appendChild(li);
+    });
+  });
+
+  socket.on("new_private_message", data => {
+    const div = document.createElement("div");
+    div.classList.add("mensaje");
+    div.innerHTML = `<span class="emisor">${data.emisor} (privado):</span> ${data.mensaje}`;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+  });
+
+  socket.on("new_broadcast_message", data => {
+    const div = document.createElement("div");
+    div.classList.add("mensaje");
+    div.innerHTML = `<span class="emisor">${data.emisor} (todos):</span> ${data.mensaje}`;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+  });
+
+  msgForm.addEventListener("submit", e => {
+    e.preventDefault();
+    const receptor = receptorInput.value.trim();
+    const mensaje = mensajeInput.value.trim();
+    if (!mensaje) return;
+
+    if (receptor) {
+      socket.emit("private_message", { receptor, mensaje });
+    } else {
+      socket.emit("broadcast_message", { mensaje });
+    }
+    mensajeInput.value = "";
+  });
+</script>
+</body>
+</html>
