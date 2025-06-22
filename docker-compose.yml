@@ -11,8 +11,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
-      rabbitmq:
-        condition: service_started
     networks:
       - chat-network
 
@@ -38,14 +36,6 @@ services:
     image: redis:alpine
     ports:
       - "6379:6379"
-    networks:
-      - chat-network
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    ports:
-      - "5672:5672"
-      - "15672:15672"
     networks:
       - chat-network
 

@@ -3,3 +3,4 @@ flask-socketio
 mysql-connector-python
 eventlet
 werkzeug
+redis

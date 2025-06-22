@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Historial con {{ partner }}</title>
+  <style>
+    body { font-family: Arial; margin: 20px; background-color: black;color: #e4e4c9;}
+    li { margin-bottom: 8px; }
+    .timestamp { color: #888; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <h1>Historial de chat con {{ partner }}</h1>
+  <ul>
+    {% for m in mensajes %}
+      <li>
+        <strong>{{ m.emisor }} → {{ m.receptor }}:</strong>
+        {{ m.mensaje }}
+        <span class="timestamp">({{ m.creado_en }})</span>
+      </li>
+    {% else %}
+      <li>No hay mensajes aún.</li>
+    {% endfor %}
+  </ul>
+</body>
+</html>

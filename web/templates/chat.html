@@ -2,14 +2,81 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
-<title>Chat</title>
+<title>Chat SV</title>
 <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
 <style>
-  body { font-family: Arial, sans-serif; margin: 20px;}
+  body { font-family: Arial, sans-serif; margin: 20px; background-color: black; color: #e4e4c9;}
   #chat { border: 1px solid #ccc; height: 300px; overflow-y: scroll; padding: 10px; background: #f9f9f9; }
   #users { margin-top: 10px; }
+  #user-list li {
+    margin-bottom: 6px;
+  }
   .mensaje { margin-bottom: 8px; }
   .emisor { font-weight: bold; }
+  /* Estilo card chat privado */
+  .chat-card {
+    border: 1px solid #888;
+    background: #fff;
+    width: 300px;
+    height: 350px;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+    z-index: 1000;
+  }
+  .chat-card-header {
+    background: #007bff;
+    color: white;
+    padding: 8px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .chat-card-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 8px;
+    background: #272728;
+  }
+  .chat-card-input {
+    display: flex;
+    padding: 8px;
+    border-top: 1px solid #ccc;
+  }
+  .chat-card-input input {
+    flex-grow: 1;
+    padding: 5px;
+  }
+  .chat-card-input button {
+    margin-left: 5px;
+  }
+  .close-chat {
+    cursor: pointer;
+    font-weight: bold;
+  }
+  /* Mensajes globales y privados */
+  #chat-global {
+    border: 1px solid #ccc;
+    height: 300px;
+    overflow-y: scroll;
+    padding: 10px;
+    background: #272728;
+  }
+  .chat-card.minimized .chat-card-messages,
+  .chat-card.minimized .chat-card-input {
+    display: none;
+  }
+
+  .chat-card.minimized {
+    height: auto;
+    width: 300px;
+    bottom: 0;
+    position: fixed;
+  }
 </style>
 </head>
 <body>
@@ -20,50 +87,167 @@
   <ul id="user-list"></ul>
 </div>
 
-<div id="chat"></div>
+<h3>Chat global</h3>
+<div id="chat-global"></div>
 
 <form id="msgForm">
-  <input type="text" id="receptor" placeholder="Usuario receptor (vacío = todos)">
+  <h3>Enviar a todos los Conectados</h3>
+  <input type="hidden" id="receptor">
   <input type="text" id="mensaje" placeholder="Escribe tu mensaje" autocomplete="off" required>
   <button type="submit">Enviar</button>
 </form>
 
 <script>
   const socket = io();
+  const username = "{{ username }}";  // Nombre propio para referencia
 
-  const chat = document.getElementById("chat");
+  const chatGlobal = document.getElementById("chat-global");
   const userList = document.getElementById("user-list");
   const msgForm = document.getElementById("msgForm");
   const receptorInput = document.getElementById("receptor");
   const mensajeInput = document.getElementById("mensaje");
 
-  socket.on("connect", () => {
-    console.log("Conectado al servidor");
-  });
+  const privateChats = {};
 
-  socket.on("user_list", users => {
-    userList.innerHTML = "";
-    users.forEach(u => {
-      const li = document.createElement("li");
-      li.textContent = u;
-      userList.appendChild(li);
+  function repositionCards() {
+    const users = Object.keys(privateChats);
+    users.forEach((user, i) => {
+      const card = privateChats[user].card;
+      card.style.right = `${20 + i * 320}px`;
     });
-  });
+  }
 
-  socket.on("new_private_message", data => {
+  function createPrivateChatCard(user) {
+    if (privateChats[user]) {
+      privateChats[user].card.style.display = "flex";
+      return;
+    }
+
+    const card = document.createElement("div");
+    card.classList.add("chat-card");
+
+
+    const header = document.createElement("div");
+    header.classList.add("chat-card-header");
+    header.textContent = `Chat privado con ${user}`;
+
+    const minimizeBtn = document.createElement("span");
+    minimizeBtn.textContent = "━";
+    minimizeBtn.classList.add("minimize-chat");
+    minimizeBtn.onclick = () => {
+    card.classList.toggle("minimized");
+    };
+    header.appendChild(minimizeBtn);
+
+    // Botón cerrar chat
+    const closeBtn = document.createElement("span");
+    closeBtn.textContent = "✖";
+    closeBtn.classList.add("close-chat");
+    closeBtn.onclick = () => {
+    card.style.display = "none";
+    };
+    header.appendChild(closeBtn);
+
+    const body = document.createElement("div");
+    body.classList.add("chat-card-body");
+
+    const messagesDiv = document.createElement("div");
+    messagesDiv.classList.add("chat-card-messages");
+
+    const inputDiv = document.createElement("div");
+    inputDiv.classList.add("chat-card-input");
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = "Escribe tu mensaje";
+    input.autocomplete = "off";
+
+    const sendBtn = document.createElement("button");
+    sendBtn.textContent = "Enviar";
+    sendBtn.onclick = () => {
+      const msg = input.value.trim();
+      if (!msg) return;
+      socket.emit("private_message", { receptor: user, mensaje: msg });
+      input.value = "";
+    };
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        sendBtn.click();
+        e.preventDefault();
+      }
+    });
+
+    inputDiv.appendChild(input);
+    inputDiv.appendChild(sendBtn);
+    body.appendChild(messagesDiv);
+    body.appendChild(inputDiv);
+
+    card.appendChild(header);
+    card.appendChild(body);
+    document.body.appendChild(card);
+
+    privateChats[user] = { card, messagesDiv, body };
+    repositionCards();
+  }
+
+  function addPrivateMessage(chatUser, emisor, mensaje) {
+    if (!privateChats[chatUser]) return;
     const div = document.createElement("div");
     div.classList.add("mensaje");
-    div.innerHTML = `<span class="emisor">${data.emisor} (privado):</span> ${data.mensaje}`;
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
-  });
+    div.innerHTML = `<span class="emisor">${emisor}:</span> ${mensaje}`;
+    privateChats[chatUser].messagesDiv.appendChild(div);
+    privateChats[chatUser].messagesDiv.scrollTop = privateChats[chatUser].messagesDiv.scrollHeight;
+  }
 
+    socket.on("user_list", users => {
+    userList.innerHTML = "";
+    users.forEach(u => {
+        const li = document.createElement("li");
+        if (u === username) {
+        li.textContent = u + " (vos)";
+        } else {
+        li.textContent = u + " ";
+
+        const chatBtn = document.createElement("button");
+        chatBtn.textContent = "Iniciar chat";
+        chatBtn.style.marginLeft = "5px";
+        chatBtn.onclick = () => createPrivateChatCard(u);
+        li.appendChild(chatBtn);
+
+        const historyBtn = document.createElement("button");
+        historyBtn.textContent = "Historial";
+        historyBtn.style.marginLeft = "5px";
+        historyBtn.onclick = () => {
+            window.open(`/history/${u}`, '_blank'); 
+        };
+        li.appendChild(historyBtn);
+        }
+
+        userList.appendChild(li);
+    });
+    });
   socket.on("new_broadcast_message", data => {
     const div = document.createElement("div");
     div.classList.add("mensaje");
     div.innerHTML = `<span class="emisor">${data.emisor} (todos):</span> ${data.mensaje}`;
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
+    chatGlobal.appendChild(div);
+    chatGlobal.scrollTop = chatGlobal.scrollHeight;
+  });
+
+  socket.on("new_private_message", data => {
+    const partner = (data.emisor === username) ? data.receptor : data.emisor;
+
+    if (!privateChats[partner]) {
+      createPrivateChatCard(partner);
+    } else {
+      const card = privateChats[partner].card;
+      if (card.style.display === "none") {
+        card.style.display = "flex";
+      }
+    }
+
+    addPrivateMessage(partner, data.emisor, data.mensaje);
   });
 
   msgForm.addEventListener("submit", e => {
@@ -80,5 +264,7 @@
     mensajeInput.value = "";
   });
 </script>
+
+
 </body>
 </html>
