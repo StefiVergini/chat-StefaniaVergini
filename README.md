@@ -4,11 +4,9 @@
 
 ## 💼 About This Project
 
-This project is a real-time chat application developed using **Flask** and **Socket.IO**, designed to support multiple users, private messaging, and persistent chat history.
+This project is a real-time chat application developed using **Flask** and **Socket.IO**, supporting multiple users, private messaging, and persistent chat history.
 
-It demonstrates the integration of real-time communication with a scalable backend architecture, combining **MySQL for data persistence**, **Redis for message brokering and session management**, and **Nginx as a reverse proxy**.
-
-The system is fully containerized using Docker, enabling consistent deployment and service orchestration.
+It demonstrates a scalable backend architecture using **MySQL**, **Redis**, and **Nginx**, fully containerized with Docker.
 
 ---
 
@@ -16,12 +14,37 @@ The system is fully containerized using Docker, enabling consistent deployment a
 
 The application allows users to:
 
-* Join a shared chat environment
-* Send and receive real-time messages
-* Initiate private conversations
-* Persist chat history in a database
+- Join a shared chat environment  
+- Send and receive real-time messages  
+- Start private conversations  
+- Persist chat history  
 
 ---
+
+## 📸 Screenshots
+
+### 🔐 Login
+![Login](login.png)
+
+---
+### Main Screen
+
+![Dashboard](image.png)
+---
+
+### 💬 Real-Time Chat
+![Chat](image-2.png)
+
+---
+
+### 📜 Chat History
+![History](image-1.png)
+
+---
+
+## 🏗️ Architecture
+
+(… lo demás queda igual …)
 
 ## 🏗️ Architecture
 
@@ -176,15 +199,6 @@ http://localhost
 
 ---
 
-## 📈 Future Improvements
-
-* User authentication enhancements (JWT)
-* Message delivery status (read/unread)
-* File sharing support
-* UI/UX improvements
-
----
-
 ## 👩‍💻 Author
 
 **Stefanía Vergini**
@@ -194,4 +208,4 @@ Full-Stack Developer
 
 ## 📬 Contact
 
-Open to new opportunities and collaborations
+stefanialvergini@gmail.com Open to new opportunities and collaborations
