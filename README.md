@@ -1,92 +1,211 @@
-# Chat-StefaniaVergini: Aplicación de Chat en Tiempo Real
+🌐 **Read this in other language:** [Español](README.es.md)
 
-## Descripción
+# 💬 Real-Time Chat Application
 
-Este proyecto es una aplicación de chat en tiempo real desarrollada con Flask y Socket.IO, que permite la comunicación entre múltiples usuarios, mensajes privados, y almacenamiento de historial. La arquitectura incluye base de datos MySQL, Redis para manejo eficiente de sesiones Socket.IO, y Nginx como proxy inverso.
+## 💼 About This Project
 
----
+This project is a real-time chat application developed using **Flask** and **Socket.IO**, supporting multiple users, private messaging, and persistent chat history.
 
-## Arquitectura
-
-                 +-----------------+
-                 |    NGINX        |
-                 |  (Port 80)      |
-                 +--------+--------+
-                          |
-                          |
-                   Proxy to port 5000
-                          |
-                 +--------v--------+
-                 |     Web         |
-                 | Flask + Socket  |
-                 | (Port 5000)     |
-                 +--------+--------+
-                          |
-              +-----------+------------+
-              |                        |
-      +-------v------+         +-------v------+
-      |    MySQL     |         |    Redis     |
-      |  (Port 3306) |         |  (Port 6379) |
-      +--------------+         +--------------+
-
-- Entrada al Sistema:
-    Los clientes acceden a través de NGINX en el puerto 80
-    NGINX redirige tanto tráfico HTTP como WebSocket al servidor Flask
-
-- Servidor Web
-    Flask maneja las rutas web estándar (login, chat, history)
-    Socket.IO gestiona la comunicación en tiempo real
-    Opera en el puerto 5000 dentro del contenedor
-
-- Almacenamiento y Cache
-* MySQL (puerto 3306):
-    Almacena usuarios y mensajes permanentemente
-    Maneja toda la persistencia de datos
-* Redis (puerto 6379):
-    Gestiona sesiones de usuario
-    Actúa como broker para la comunicación Pub/Sub (conexión persistente) de Socket.IO
-    Facilita la comunicación entre múltiples instancias del servidor
-
-### Servicios:
-
-- **web**: Aplicación Flask que implementa el frontend y backend del chat. Usa Flask-SocketIO con Redis.
-- **mysql**: Base de datos que almacena usuarios, mensajes y sesiones. Se inicializa con `init.sql`.
-- **redis**: Sistema de cache utilizado para manejar las conexiones en tiempo real de Socket.IO.
-- **nginx**: Proxy inverso que enruta el tráfico HTTP hacia el servicio web.
-
-Todos los servicios se comunican dentro de la red `chat-network`.
+It demonstrates a scalable backend architecture using **MySQL**, **Redis**, and **Nginx**, fully containerized with Docker.
 
 ---
 
-## Requisitos
+## 📌 Overview
 
-- Docker
-- Docker Compose
+The application allows users to:
+
+- Join a shared chat environment  
+- Send and receive real-time messages  
+- Start private conversations  
+- Persist chat history  
 
 ---
 
-## Instrucciones
+## 📸 Screenshots
 
-1. Cloná este repositorio:
+### 🔐 Login
+![Login](login.png)
 
-   git clone https://github.com/StefiVergini/chat-StefaniaVergini.git
-   cd chat-StefaniaVergini
+---
+### Main Screen
 
-2. Iniciá los contenedores:
+![Dashboard](image.png)
+---
 
-    docker-compose up --build
+### 💬 Real-Time Chat
+![Chat](image-2.png)
 
-3. Accedé a la aplicación desde el navegador:
+---
 
-    Navegá a http://localhost
+### 📜 Chat History
+![History](image-1.png)
 
-4. Ingresá un nombre de usuario (no puede haber dos usuarios iguales) en el login y     contraseña. 
-    Si es el primer ingreso, se creará tu usuario desde la misma pantalla.
-    [Ejemplo: usuario 'juan' y contraseña: '1234']
+---
 
-5. Al acceder, visualizá los usuarios conectados, enviá mensajes públicos o iniciá chats privados.
-    ![alt text](image.png)
-    ![alt text](image-2.png)
+## 🏗️ Architecture
 
-6. Visualizá el historial de conversación de los usuarios conectados.
-    ![alt text](image-1.png)
+(… lo demás queda igual …)
+
+## 🏗️ Architecture
+
+```
+             +-----------------+
+             |     NGINX       |
+             |    (Port 80)    |
+             +--------+--------+
+                      |
+               Proxy to port 5000
+                      |
+             +--------v--------+
+             |      Web        |
+             | Flask + Socket  |
+             |  (Port 5000)    |
+             +--------+--------+
+                      |
+          +-----------+------------+
+          |                        |
+  +-------v------+         +-------v------+
+  |    MySQL     |         |    Redis     |
+  |  (Port 3306) |         |  (Port 6379) |
+  +--------------+         +--------------+
+```
+
+---
+
+## ⚙️ System Components
+
+### 🌐 Nginx
+
+* Acts as a reverse proxy
+* Routes HTTP and WebSocket traffic to the Flask application
+
+### 🧠 Flask + Socket.IO
+
+* Handles HTTP routes (login, chat, history)
+* Manages real-time communication between clients
+* Runs on port 5000 inside the container
+
+### 🗄️ MySQL
+
+* Stores users and chat messages
+* Ensures persistent data storage
+
+### ⚡ Redis
+
+* Manages user sessions
+* Acts as a Pub/Sub broker for Socket.IO
+* Enables scalable real-time communication
+
+---
+
+## 🧩 Services
+
+* **web**: Flask application with Socket.IO
+* **mysql**: Database initialized with `init.sql`
+* **redis**: Cache and message broker
+* **nginx**: Reverse proxy
+
+All services run within a shared Docker network.
+
+---
+
+## 🚀 Features
+
+* Real-time messaging using WebSockets
+* Private and public chat support
+* Persistent chat history
+* Multi-user environment
+* Scalable architecture with Redis Pub/Sub
+* Containerized setup with Docker Compose
+
+---
+
+## 🛠️ Tech Stack
+
+**Backend**
+
+* Python (Flask)
+* Flask-SocketIO
+
+**Infrastructure**
+
+* Docker / Docker Compose
+* Nginx
+
+**Database & Cache**
+
+* MySQL
+* Redis
+
+---
+
+## ⚙️ Installation & Setup
+
+### 🔧 Requirements
+
+* Docker
+* Docker Compose
+
+---
+
+### 📥 Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/StefiVergini/chat-StefaniaVergini.git
+cd chat-StefaniaVergini
+```
+
+---
+
+### ▶️ Run the application
+
+```bash
+docker-compose up --build
+```
+
+---
+
+### 🌐 Access
+
+Open your browser and go to:
+
+```
+http://localhost
+```
+
+---
+
+## 🔐 Usage
+
+* Enter a username and password
+* If the user does not exist, it will be created automatically
+* Once logged in, you can:
+
+  * View connected users
+  * Send public messages
+  * Start private chats
+
+---
+
+## 💡 Architecture Highlights
+
+* Separation of concerns using microservices
+* Real-time communication handled via WebSockets
+* Redis used for horizontal scalability and session handling
+* Reverse proxy setup with Nginx
+* Fully containerized environment
+
+---
+
+## 👩‍💻 Author
+
+**Stefanía Vergini**
+Full-Stack Developer
+
+---
+
+## 📬 Contact
+
+stefanialvergini@gmail.com Open to new opportunities and collaborations
