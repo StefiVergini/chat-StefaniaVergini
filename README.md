@@ -24,28 +24,6 @@ The application allows users to:
 
 ---
 
-## 📸 Screenshots
-
-### 🔐 Login
-![Login](login.png)
-
----
-### Main Screen
-
-![Dashboard](image.png)
----
-
-### 💬 Real-Time Chat
-![Chat](image-2.png)
-
----
-
-### 📜 Chat History
-![History](image-1.png)
-
----
-
-
 ## 🏗️ Architecture
 
 ```
@@ -117,6 +95,27 @@ All services run within a shared Docker network.
 * Multi-user environment
 * Scalable architecture with Redis Pub/Sub
 * Containerized setup with Docker Compose
+
+---
+
+## 📸 Screenshots
+
+### 🔐 Login
+![Login](login.png)
+
+---
+### Main Screen
+
+![Dashboard](image.png)
+---
+
+### 💬 Real-Time Chat
+![Chat](image-2.png)
+
+---
+
+### 📜 Chat History
+![History](image-1.png)
 
 ---
 

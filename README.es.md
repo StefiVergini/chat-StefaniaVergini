@@ -26,31 +26,6 @@ La aplicación permite:
 
 ---
 
-## 📸 Capturas del sistema
-
-### 🔐 Login
-
-![Login](login.png)
-
----
-### Pantalla principal
-
-![Chat](image.png)
-
----
-
-### 💬 Chat en tiempo real
-
-![Chat](image-2.png)
-
----
-
-### 📜 Historial de conversaciones
-
-![Historial](image-1.png)
-
----
-
 ## 🏗️ Arquitectura
 
 ```
@@ -122,6 +97,31 @@ Todos los servicios se ejecutan dentro de la red `chat-network`.
 * Soporte multiusuario
 * Arquitectura escalable con Redis
 * Entorno containerizado con Docker
+
+---
+
+## 📸 Capturas del sistema
+
+### 🔐 Login
+
+![Login](login.png)
+
+---
+### Pantalla principal
+
+![Chat](image.png)
+
+---
+
+### 💬 Chat en tiempo real
+
+![Chat](image-2.png)
+
+---
+
+### 📜 Historial de conversaciones
+
+![Historial](image-1.png)
 
 ---
 
