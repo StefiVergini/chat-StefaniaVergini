@@ -2,6 +2,9 @@
 
 # 💬 Real-Time Chat Application
 
+## 🎬 Demo
+![Double Login - Real-Time Chat - Global Chat - Record - Logout](gif/LoginToLogout.gif)
+
 ## 💼 About This Project
 
 This project is a real-time chat application developed using **Flask** and **Socket.IO**, supporting multiple users, private messaging, and persistent chat history.
@@ -42,9 +45,6 @@ The application allows users to:
 
 ---
 
-## 🏗️ Architecture
-
-(… lo demás queda igual …)
 
 ## 🏗️ Architecture
 

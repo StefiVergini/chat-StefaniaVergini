@@ -2,6 +2,9 @@
 
 # 💬 Aplicación de Chat en Tiempo Real
 
+## 🎬 Demo
+![Doble Ingreso - Chat en Tiempo Real - Chat Global - Historial - Salir](gif/LoginToLogout.gif)
+
 ## 💼 Sobre este proyecto
 
 Este proyecto es una aplicación de chat en tiempo real desarrollada con **Flask** y **Socket.IO**, que permite la comunicación entre múltiples usuarios, mensajería privada y almacenamiento persistente del historial.
