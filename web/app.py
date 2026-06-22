@@ -239,7 +239,7 @@ def history(partner):
     try:
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
-        # Tomar mensajes entre ambos, incluyendo global (receptor IS NULL) si querés
+        # Tomar mensajes entre ambos, incluyendo global (receptor IS NULL)
         cursor.execute("""
             SELECT u1.nombre AS emisor, u2.nombre AS receptor, m.mensaje, m.creado_en
             FROM mensajes m
