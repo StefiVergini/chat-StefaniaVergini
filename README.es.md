@@ -73,7 +73,6 @@ La aplicación permite:
 ### ⚡ Redis
 
 * Maneja sesiones de usuario
-* Actúa como broker Pub/Sub
 * Permite escalar la comunicación en tiempo real
 
 ---
@@ -82,7 +81,7 @@ La aplicación permite:
 
 * **web**: Aplicación Flask con Socket.IO
 * **mysql**: Base de datos inicializada con `init.sql`
-* **redis**: Sistema de cache y mensajería
+* **redis**: Sesiones de usuarios
 * **nginx**: Proxy inverso
 
 Todos los servicios se ejecutan dentro de la red `chat-network`.
