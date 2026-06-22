@@ -71,7 +71,6 @@ The application allows users to:
 ### ⚡ Redis
 
 * Manages user sessions
-* Acts as a Pub/Sub broker for Socket.IO
 * Enables scalable real-time communication
 
 ---
@@ -80,7 +79,7 @@ The application allows users to:
 
 * **web**: Flask application with Socket.IO
 * **mysql**: Database initialized with `init.sql`
-* **redis**: Cache and message broker
+* **redis**: Users sessions
 * **nginx**: Reverse proxy
 
 All services run within a shared Docker network.
@@ -93,7 +92,7 @@ All services run within a shared Docker network.
 * Private and public chat support
 * Persistent chat history
 * Multi-user environment
-* Scalable architecture with Redis Pub/Sub
+* Scalable architecture with Redis
 * Containerized setup with Docker Compose
 
 ---
